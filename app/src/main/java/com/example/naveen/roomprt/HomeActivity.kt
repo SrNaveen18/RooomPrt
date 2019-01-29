@@ -1,5 +1,6 @@
 package com.example.naveen.roomprt
 
+import android.animation.ObjectAnimator
 import android.arch.lifecycle.Observer
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
@@ -20,7 +21,13 @@ import kotlin.collections.ArrayList
 import android.widget.RadioButton
 import com.example.naveen.roomprt.questions.AnsCheckList
 import android.support.v7.app.AlertDialog
-
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.support.v4.view.ViewCompat.animate
+import android.R.attr.translationY
 
 
 class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnCheckedChangeListener {
@@ -33,12 +40,17 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
     private var sublist: List<Questions1> = ArrayList()
     private var ansCheckList = ArrayList<AnsCheckList>()
 
-
+    lateinit var mAdView: AdView
     private var currentQuesPosition = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544~3347511713")
+
+        mAdView = findViewById(R.id.ad_view)
+        val adRequest = AdRequest.Builder().build()
+        mAdView.loadAd(adRequest)
 
         val databaseState = RoomPreferencesHelper.getStringValue(this, RoomPreferenceKey.databaseState)
         quesDbInitializer = QuesDbInitializer(application)
@@ -81,13 +93,21 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
 
     override fun onClick(v: View?) {
         when (v?.id) {
-            R.id.btnCategory -> { jsonConverter() }
+            R.id.btnCategory -> {
+                jsonConverter()
+            }
 
-            R.id.btnPrevious -> { previousQuiz() }
+            R.id.btnPrevious -> {
+                previousQuiz()
+            }
 
-            R.id.btnNext -> { nextQuiz() }
+            R.id.btnNext -> {
+                nextQuiz()
+            }
 
-            R.id.btnCheckResult->{ showResult()}
+            R.id.btnCheckResult -> {
+                showResult()
+            }
         }
     }
 
@@ -102,12 +122,21 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
     fun nextQuiz() {
         currentQuesPosition++
         createAnswer(0)
-        if (currentQuesPosition == sublist.size - 1) {
-            btnPrevious.visibility = View.VISIBLE
-            btnNext.visibility = View.INVISIBLE
-        } else {
-            btnPrevious.visibility = View.VISIBLE
-            btnNext.visibility = View.INVISIBLE
+
+//        if (currentQuesPosition == sublist.size - 1) {
+//            btnPrevious.visibility = View.VISIBLE
+//            btnNext.visibility = View.INVISIBLE
+//        } else {
+
+            if (currentQuesPosition == sublist.size - 1 ||
+                currentQuesPosition >= ansCheckList.size &&
+                ansCheckList[currentQuesPosition].answer == 0) {
+                btnPrevious.visibility = View.VISIBLE
+                btnNext.visibility = View.INVISIBLE
+            } else {
+                btnPrevious.visibility = View.VISIBLE
+                btnNext.visibility = View.VISIBLE
+
         }
         loadQuestion(currentQuesPosition)
         setAnswerIsthere()
@@ -163,7 +192,7 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
     fun loadJSONFromAsset(): String {
         var json: String? = ""
         try {
-            val inputStream = assets.open("convertcsv.json")
+            val inputStream = assets.open("questions.json")
             val size = inputStream.available()
             val buffer = ByteArray(size)
             inputStream.read(buffer)
@@ -183,15 +212,15 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
         val isChecked: Boolean = checkedRadioButton?.isChecked ?: false
         val idx = group?.indexOfChild(checkedRadioButton)
         if (isChecked) {
-            if(currentQuesPosition == sublist.size - 1){
+            if (currentQuesPosition == sublist.size - 1) {
                 btnPrevious.visibility = View.VISIBLE
                 btnNext.visibility = View.INVISIBLE
                 btnCheckResult.visibility = View.VISIBLE
-            }else if(currentQuesPosition == 0){
+            } else if (currentQuesPosition == 0) {
                 btnPrevious.visibility = View.INVISIBLE
                 btnNext.visibility = View.VISIBLE
                 btnCheckResult.visibility = View.GONE
-            }else{
+            } else {
                 btnCheckResult.visibility = View.GONE
                 btnNext.visibility = View.VISIBLE
                 btnPrevious.visibility = View.VISIBLE
@@ -199,13 +228,13 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
             updateAnswer((idx?.plus(1) ?: 0))
         } else {
             btnCheckResult.visibility = View.GONE
-            if(currentQuesPosition == sublist.size - 1){
+            if (currentQuesPosition == sublist.size - 1) {
                 btnPrevious.visibility = View.VISIBLE
                 btnNext.visibility = View.INVISIBLE
-            }else if(currentQuesPosition == 0){
+            } else if (currentQuesPosition == 0) {
                 btnPrevious.visibility = View.INVISIBLE
                 btnNext.visibility = View.VISIBLE
-            }else{
+            } else {
                 btnPrevious.visibility = View.VISIBLE
                 btnNext.visibility = View.INVISIBLE
             }
@@ -215,7 +244,8 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
     fun createAnswer(answer: Int) {
         if (currentQuesPosition >= ansCheckList.size) {
             ansCheckList.add(
-                currentQuesPosition, AnsCheckList(currentQuesPosition, sublist[currentQuesPosition].A, answer
+                currentQuesPosition, AnsCheckList(
+                    currentQuesPosition, sublist[currentQuesPosition].A, answer
                 )
             )
         }
@@ -223,14 +253,15 @@ class HomeActivity : AppCompatActivity(), View.OnClickListener, RadioGroup.OnChe
 
 
     fun updateAnswer(answer: Int) {
-        ansCheckList[currentQuesPosition] = AnsCheckList(currentQuesPosition, sublist[currentQuesPosition].A, answer
+        ansCheckList[currentQuesPosition] = AnsCheckList(
+            currentQuesPosition, sublist[currentQuesPosition].A, answer
         )
     }
 
 
-    fun showResult(){
-        val intent = Intent(this,ResultActivity::class.java)
-        intent.putExtra(RoomPreferenceKey.resultArray,ansCheckList)
+    fun showResult() {
+        val intent = Intent(this, ResultActivity::class.java)
+        intent.putExtra(RoomPreferenceKey.resultArray, ansCheckList)
         startActivity(intent)
     }
 
