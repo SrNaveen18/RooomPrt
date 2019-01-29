@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".HomeActivity">
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+        <Button android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnCategory"
+                android:text="Show Category"/>
+        <TextView android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="16dp"
+                  android:gravity="center"
+                  android:textStyle="bold"
+                  android:textColor="@android:color/darker_gray"
+                  android:id="@+id/txtCount"/>
+
+        <TextView android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:padding="16dp"
+                  android:id="@+id/txtQues"/>
+
+
+        <RadioGroup android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:id="@+id/radioGp">
+
+            <RadioButton android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:padding="16dp"
+                         android:id="@+id/rdbtn1"/>
+
+            <RadioButton android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:padding="16dp"
+                         android:id="@+id/rdbtn2"/>
+            <RadioButton android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:padding="16dp"
+                         android:id="@+id/rdbtn3"/>
+            <RadioButton android:layout_width="match_parent"
+                         android:layout_height="wrap_content"
+                         android:padding="16dp"
+                         android:id="@+id/rdbtn4"/>
+
+
+        </RadioGroup>
+
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:padding="10dp"
+                      android:layout_gravity="bottom"
+                      android:orientation="horizontal">
+            <Button android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnPrevious"
+                    android:visibility="gone"
+                    android:text="PRV"/>
+            <Button android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnNext"
+                    android:visibility="gone"
+                    android:text="NXT"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:padding="10dp">
+            <Button android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Check Result"
+                    android:visibility="gone"
+                    android:id="@+id/btnCheckResult"/>
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+
+</android.support.design.widget.CoordinatorLayout>
